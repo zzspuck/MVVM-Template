@@ -12,7 +12,15 @@
         <toolWindow factoryClass="com.github.zzspuck.mvvmtemplate.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
     </extensions>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.github.zzspuck.mvvmtemplate.services.MyProjectService"/>
+    </extensions>
+
     <applicationListeners>
         <listener class="com.github.zzspuck.mvvmtemplate.listeners.MyFrameStateListener" topic="com.intellij.ide.FrameStateListener"/>
+        <listener class="com.github.zzspuck.mvvmtemplate.listeners.MyProjectManagerListener" topic="com.intellij.ide.ProjectManagerListener"/>
     </applicationListeners>
+    <extensions defaultExtensionNs="com.android.tools.idea.wizard.template">
+        <wizardTemplateProvider implementation="temparms.ArmsPluginTemplateProviderImpl" />
+    </extensions>
 </idea-plugin>
