@@ -6,6 +6,7 @@ import com.intellij.openapi.project.ProjectManagerListener
 
 internal class MyProjectManagerListener : ProjectManagerListener {
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun projectOpened(project: Project) {
         projectInstance = project
         project.getService(MyProjectService::class.java)

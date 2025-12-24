@@ -5,10 +5,10 @@ import temparms.ArmsPluginTemplateProviderImpl
 fun armsRepository(provider: ArmsPluginTemplateProviderImpl) = """
 package ${provider.repositoryPackageName.value}
 
-import com.love.jetpackmvvm.base.repository.BaseRepository
+import com.lovemaps.jetpackmvvm.base.repository.BaseRepository
 
-class ${provider.pageName.value}Repository: BaseRepository(){
-    
+class ${provider.pageName.value}Repository: BaseRepository() {
 
-}   
+
+}
 """

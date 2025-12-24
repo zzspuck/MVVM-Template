@@ -63,8 +63,8 @@ class ArmsPluginTemplateProviderImpl : WizardTemplateProvider() {
     val appPackageName = stringParameter {
         name = "Root Package Name"
         constraints = listOf(Constraint.PACKAGE)
-        default = "com.mycompany.myapp"
-        help = "请填写你的项目包名,请认真核实此包名是否是正确的项目包名,不能包含子包,正确的格式如:me.jessyan.arms"
+        default = "com.lovemaps.app"
+        help = "请填写你的项目包名,请认真核实此包名是否是正确的项目包名,不能包含子包,正确的格式如:com.lovemaps.app"
     }
 
     //是否需要
