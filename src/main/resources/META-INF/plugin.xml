@@ -5,6 +5,9 @@
     <vendor>zzspuck</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.android</depends>
+    <!-- Kotlin 作为可选依赖，兼容 K2 模式 -->
+    <depends optional="true" config-file="kotlin-features.xml">org.jetbrains.kotlin</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 

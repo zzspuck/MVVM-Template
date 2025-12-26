@@ -64,6 +64,11 @@ tasks {
         gradleVersion = properties("gradleVersion").get()
     }
 
+    // 禁用 buildSearchableOptions 任务（模板插件不需要）
+    buildSearchableOptions {
+        enabled = false
+    }
+
     patchPluginXml {
         version = properties("pluginVersion")
         sinceBuild = properties("pluginSinceBuild")
