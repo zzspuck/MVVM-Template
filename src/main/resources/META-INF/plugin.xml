@@ -1,8 +1,8 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.zzspuck.mvvmtemplate</id>
-    <name>MVVM-Template Template</name>
-    <vendor>zzspuck</vendor>
+    <name>MVVM-Template</name>
+    <vendor email="support@zzspuck.com" url="https://github.com/zzspuck/MVVM-Template">zzspuck</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.android</depends>
