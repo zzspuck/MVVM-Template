@@ -3,7 +3,7 @@ package other.mvvm.temparms.src.app_package
 import temparms.ArmsPluginTemplateProviderImpl
 
 fun armsActivity(provider: ArmsPluginTemplateProviderImpl) = """
-package ${provider.activityPackageName.value}
+package ${provider.pagePackageName.value}
 
 import android.os.Bundle
 import com.lovemaps.core.base.BaseMvvmActivity

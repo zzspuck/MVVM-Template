@@ -5,6 +5,11 @@ import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
 import other.mvvm.temparms.armsRecipe
 import java.io.File
 
+enum class PageType {
+    Activity,
+    Fragment
+}
+
 class ArmsPluginTemplateProviderImpl : WizardTemplateProvider() {
     override fun getTemplates(): List<Template> = listOf(
             armsTemplate
@@ -12,8 +17,8 @@ class ArmsPluginTemplateProviderImpl : WizardTemplateProvider() {
 
     val armsTemplate: Template
         get() = template {
-            name = "Jetpack mvvm 全家桶 插件版"
-            description = "一键创建 JetpackMvvm(被telyo扩展后)单个页面所需要的全部组件"
+            name = "Mvvm 全家桶 插件版"
+            description = "一键创建 JetpackMvvm单个页面所需要的全部组件"
             minApi = MIN_API
             category = Category.Activity
             formFactor = FormFactor.Mobile
@@ -24,15 +29,12 @@ class ArmsPluginTemplateProviderImpl : WizardTemplateProvider() {
                     TextFieldWidget(pageName),
                     PackageNameWidget(appPackageName),
                     TextFieldWidget(appPackageName),
-                    CheckBoxWidget(needActivity),
+                    EnumWidget(pageType),
+                    CheckBoxWidget(useCompose),
                     CheckBoxWidget(isModule),
-                    TextFieldWidget(activityLayoutName),
-                    CheckBoxWidget(generateActivityLayout),
-                    TextFieldWidget(activityPackageName),
-                    CheckBoxWidget(needFragment),
-                    TextFieldWidget(fragmentLayoutName),
-                    CheckBoxWidget(generateFragmentLayout),
-                    TextFieldWidget(fragmentPackageName),
+                    TextFieldWidget(layoutName),
+                    CheckBoxWidget(generateLayout),
+                    TextFieldWidget(pagePackageName),
                     CheckBoxWidget(needViewModel),
                     TextFieldWidget(viewModelPackageName),
                     CheckBoxWidget(needRepository),
@@ -67,11 +69,18 @@ class ArmsPluginTemplateProviderImpl : WizardTemplateProvider() {
         help = "请填写你的项目包名,请认真核实此包名是否是正确的项目包名,不能包含子包,正确的格式如:com.lovemaps.app"
     }
 
-    //是否需要
-    val needActivity = booleanParameter {
-        name = "Generate Activity"
-        default = true
-        help = "是否需要生成 Activity ? 不勾选则不生成"
+    //页面类型 (Activity 或 Fragment)
+    val pageType = enumParameter<PageType> {
+        name = "Page Type"
+        default = PageType.Activity
+        help = "选择要生成的页面类型: Activity 或 Fragment (二选一)"
+    }
+
+    //是否使用 Compose 版本
+    val useCompose = booleanParameter {
+        name = "Use Compose Version"
+        default = false
+        help = "是否使用 Compose 版本 (BaseComposeActivity/BaseComposeFragment)? 勾选则生成 Compose 版本,否则生成普通的 BaseMvvm 版本"
     }
 
     //组件化相关
@@ -81,67 +90,41 @@ class ArmsPluginTemplateProviderImpl : WizardTemplateProvider() {
         help = "是否是组件化模块，如果是就会在两个AndroidManifest.xml都加上activity标签"
     }
 
-    //layout xml 文件
-    val activityLayoutName = stringParameter {
-        name = "Activity Layout Name"
+    //layout xml 文件 (根据页面类型动态显示)
+    val layoutName = stringParameter {
+        name = "Layout Name"
         constraints = listOf(Constraint.LAYOUT, Constraint.NONEMPTY)
-        suggest = { activityToLayout(pageName.value) }
+        suggest = {
+            when (pageType.value) {
+                PageType.Activity -> activityToLayout(pageName.value)
+                PageType.Fragment -> "fragment_${classToResource(pageName.value)}"
+            }
+        }
         default = "activity_main"
-        visible = { needActivity.value }
-        help = "Activity 创建之前需要填写 Activity 的布局名,若布局已创建就直接填写此布局名,若还没创建此布局,请勾选下面的单选框"
+        visible = { !useCompose.value }
+        help = "页面创建之前需要填写布局名,若布局已创建就直接填写此布局名,若还没创建此布局,请勾选下面的单选框 (Compose 版本不需要布局文件)"
     }
 
     //是否需要 layout xml 文件
-    val generateActivityLayout = booleanParameter {
-        name = "Generate Activity Layout"
+    val generateLayout = booleanParameter {
+        name = "Generate Layout"
         default = true
-        visible = { needActivity.value }
-        help = "是否需要给 Activity 生成布局? 若勾选,则使用上面的布局名给此 Activity 创建默认的布局"
+        visible = { !useCompose.value }
+        help = "是否需要生成布局? 若勾选,则使用上面的布局名创建默认的布局 (Compose 版本不需要布局文件)"
     }
 
-    //Activity 路径
-    val activityPackageName = stringParameter {
-        name = "Ativity Package Name"
+    //页面路径 (根据页面类型动态显示)
+    val pagePackageName = stringParameter {
+        name = "Page Package Name"
         constraints = listOf(Constraint.STRING)
-        suggest = { "${appPackageName.value}.mvvm.ui.activity" }
-        visible = { needActivity.value }
-        default ="${appPackageName.value}.mvvm.ui.activity"
-        help = "Activity 将被输出到此包下,请认真核实此包名是否是你需要输出的目标包名"
-    }
-
-    //是否需要生成 Fragment
-    val needFragment = booleanParameter {
-        name = "Generate Fragment"
-        default = false
-        help = "是否需要生成 Fragment ? 不勾选则不生成"
-    }
-
-    //Fragment xml 文件
-    val fragmentLayoutName = stringParameter {
-        name = "Fragment Layout Name"
-        constraints = listOf(Constraint.LAYOUT, Constraint.NONEMPTY)
-        suggest = { "fragment_${classToResource(pageName.value)}" }
-        default = "fragment_main"
-        visible = { needFragment.value }
-        help = "Fragment 创建之前需要填写 Fragment 的布局名,若布局已创建就直接填写此布局名,若还没创建此布局,请勾选下面的单选框"
-    }
-
-    //是否需要生成 Fragment layout 文件
-    val generateFragmentLayout = booleanParameter {
-        name = "Generate Fragment Layout"
-        default = true
-        visible = { needFragment.value }
-        help = "是否需要给 Fragment 生成布局? 若勾选,则使用上面的布局名给此 Fragment 创建默认的布局"
-    }
-
-    //fragment 路径
-    val fragmentPackageName = stringParameter {
-        name = "Fragment Package Name"
-        constraints = listOf(Constraint.STRING)
-        suggest = { "${appPackageName.value}.mvvm.ui.fragment" }
-        visible = { needFragment.value }
-        default = "${appPackageName.value}.mvvm.ui.fragment"
-        help = "Fragment 将被输出到此包下,请认真核实此包名是否是你需要输出的目标包名"
+        suggest = {
+            when (pageType.value) {
+                PageType.Activity -> "${appPackageName.value}.mvvm.ui.activity"
+                PageType.Fragment -> "${appPackageName.value}.mvvm.ui.fragment"
+            }
+        }
+        default = "${appPackageName.value}.mvvm.ui.activity"
+        help = "页面将被输出到此包下,请认真核实此包名是否是你需要输出的目标包名"
     }
 
     // mvvm 相关
